@@ -1,0 +1,1981 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Daylio</title>
+  <style>
+    :root{
+      --bg-gradient: radial-gradient(circle at top, #dbeafe 0, #f9fafb 45%, #f5f3ff 100%);
+      --card-bg: rgba(255,255,255,0.96);
+      --muted:#6b7280;
+      --border-soft:#e5e7eb;
+      --shadow-soft:0 18px 45px rgba(15,23,42,0.18);
+      --accent:#111827;
+      --payment-border:#bae6fd;
+      --payment-bg:#eff6ff;
+    }
+
+    *{box-sizing:border-box}
+
+    html,body{
+      height:100%;
+      margin:0;
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Inter",sans-serif;
+      background:var(--bg-gradient);
+      color:#111827;
+    }
+
+    body{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:16px;
+    }
+
+    .wrap{
+      width:100%;
+      max-width:480px;
+    }
+
+    .app{
+      width:100%;
+      background:var(--card-bg);
+      border-radius:18px;
+      box-shadow:var(--shadow-soft);
+      padding:14px 14px 12px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .app::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      height:4px;
+      background:linear-gradient(90deg,#6366f1,#22c55e,#f97316);
+      opacity:.9;
+    }
+
+    .content{
+      margin-top:6px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+      margin-bottom:4px;
+    }
+
+    .app-title{
+      font-weight:700;
+      font-size:18px;
+      letter-spacing:0.03em;
+    }
+
+    .topbar-settings{
+      position:absolute;
+      right:0;
+      top:0;
+    }
+
+    .header{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+    }
+
+    .title-wrap{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+
+    .subtitle{
+      font-size:11px;
+      color:var(--muted);
+    }
+
+    .profile-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:4px 8px;
+      border-radius:999px;
+      background:#f3f4ff;
+      font-size:11px;
+      color:#4f46e5;
+      font-weight:500;
+      cursor:pointer;
+    }
+
+    .profile-pill:hover{
+      background:#e0e7ff;
+    }
+
+    .profile-dot{
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:#4f46e5;
+    }
+
+    .controls{
+      display:flex;
+      gap:6px;
+      align-items:center;
+      justify-content:flex-end;
+    }
+
+    .icon-btn{
+      border-radius:999px;
+      border:1px solid #e5e7eb;
+      background:#f9fafb;
+      padding:5px 8px;
+      font-size:11px;
+      display:inline-flex;
+      align-items:center;
+      gap:4px;
+      cursor:pointer;
+      transition:background .12s ease, transform .08s ease, box-shadow .12s ease;
+    }
+
+    .icon-btn span{
+      opacity:.7;
+      font-size:10px;
+    }
+
+    .icon-btn:active{
+      transform:translateY(1px) scale(0.98);
+      box-shadow:none;
+    }
+
+    .month-label{
+      font-size:12px;
+      font-weight:600;
+      padding:0 4px;
+      min-width:72px;
+      text-align:center;
+    }
+
+    .range{
+      display:flex;
+      gap:8px;
+      align-items:flex-end;
+      flex-wrap:wrap;
+      padding:8px 10px;
+      border-radius:12px;
+      background:#f9fafb;
+      border:1px solid #e5e7eb;
+    }
+
+    .range label{
+      font-size:11px;
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      flex:1;
+      min-width:0;
+    }
+
+    input[type=date]{
+      padding:6px 8px;
+      border-radius:999px;
+      border:1px solid #e5e7eb;
+      font-size:12px;
+      background:#fff;
+    }
+
+    .countBtn{
+      padding:7px 10px;
+      border-radius:999px;
+      border:0;
+      background:#111827;
+      color:#fff;
+      font-weight:600;
+      cursor:pointer;
+      font-size:12px;
+      display:inline-flex;
+      align-items:center;
+      gap:4px;
+      white-space:nowrap;
+      box-shadow:0 6px 18px rgba(15,23,42,0.35);
+      transition:transform .08s ease, box-shadow .12s ease, background .12s ease;
+    }
+
+    .countBtn:active{
+      transform:translateY(1px) scale(0.98);
+      box-shadow:0 2px 8px rgba(15,23,42,0.25);
+    }
+
+    .filters{
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+      padding:4px 2px 0;
+      align-items:center;
+    }
+
+    .filters-label{
+      font-size:11px;
+      color:var(--muted);
+      margin-right:2px;
+    }
+
+    .filter-btn{
+      border-radius:999px;
+      border:1px solid #e5e7eb;
+      padding:4px 9px;
+      font-size:11px;
+      background:#fff;
+      display:inline-flex;
+      align-items:center;
+      gap:4px;
+      cursor:pointer;
+      transition:background .12s ease, border-color .12s ease, transform .08s ease, box-shadow .12s ease;
+    }
+
+    .filter-btn-active{
+      background:#111827;
+      color:#fff;
+      border-color:#111827;
+      box-shadow:0 4px 12px rgba(15,23,42,0.25);
+    }
+
+    .filter-btn:active{
+      transform:translateY(1px) scale(0.98);
+      box-shadow:none;
+    }
+
+    .filter-color{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+    }
+
+    #calendarWrap{
+      border-radius:14px;
+      border:1px solid #e5e7eb;
+      background:linear-gradient(to bottom,#ffffff,#f9fafb);
+      padding:8px 8px 10px;
+    }
+
+    .calendar{
+      display:grid;
+      grid-template-columns:repeat(7,1fr);
+      gap:6px;
+    }
+
+    .weekday{
+      font-size:11px;
+      color:var(--muted);
+      text-align:center;
+      padding-bottom:2px;
+    }
+
+    .day{
+      background:#ffffff;
+      height:58px;
+      border-radius:12px;
+      padding:4px 5px 4px 6px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      cursor:pointer;
+      border:1px solid #e5e7eb;
+      position:relative;
+      transition:background .12s ease,border-color .12s ease,transform .08s ease,box-shadow .12s ease;
+    }
+
+    .day:hover{
+      background:#f3f4ff;
+      border-color:#c7d2fe;
+      box-shadow:0 4px 10px rgba(129,140,248,0.25);
+    }
+
+    .daynum{
+      font-weight:600;
+      font-size:12px;
+    }
+
+    .dots{
+      display:flex;
+      gap:4px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .dot{
+      width:9px;
+      height:9px;
+      border-radius:50%;
+      display:inline-block;
+      box-shadow:0 0 0 1px rgba(255,255,255,0.8);
+    }
+
+    .today{
+      border-color:#22c55e;
+      box-shadow:0 0 0 1px rgba(34,197,94,0.5),0 4px 10px rgba(34,197,94,0.25);
+    }
+
+    /* Day that has any payment */
+    .payment-day{
+      border-color:var(--payment-border);
+      box-shadow:0 0 0 1px #e0f2fe inset;
+      background:#f8fbff;
+    }
+
+    .summary{
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+      padding:6px;
+      border-radius:12px;
+      background:#f9fafb;
+      border:1px solid #e5e7eb;
+      min-height:34px;
+    }
+
+    .summary-item{
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      padding:5px 8px;
+      border-radius:999px;
+      background:#ffffff;
+      border:1px solid #e5e7eb;
+      font-weight:500;
+      font-size:11px;
+      box-shadow:0 3px 8px rgba(15,23,42,0.08);
+    }
+
+    .summary-color{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+    }
+
+    .summary-total{
+      font-weight:600;
+    }
+
+    .payment-chip{
+      border-color:var(--payment-border);
+      background:var(--payment-bg);
+    }
+
+    .footer{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      justify-content:center;
+      padding-top:4px;
+    }
+
+    .bigbtn{
+      flex:1;
+      min-width:47%;
+      padding:11px 10px;
+      border-radius:999px;
+      border:0;
+      font-weight:600;
+      font-size:13px;
+      color:#fff;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+      box-shadow:0 8px 20px rgba(15,23,42,0.35);
+      transition:transform .08s ease, box-shadow .12s ease, filter .08s ease;
+      text-transform:none;
+    }
+
+    .bigbtn:active{
+      transform:translateY(1px) scale(0.97);
+      box-shadow:0 3px 10px rgba(15,23,42,0.28);
+      filter:brightness(.96);
+    }
+
+    .ghost{
+      background:#ffffff;
+      border:1px solid #e5e7eb;
+      color:#111827;
+      box-shadow:none;
+    }
+
+    .ghost:active{
+      transform:translateY(1px) scale(0.98);
+      box-shadow:none;
+      filter:brightness(.97);
+    }
+
+    .small{font-size:12px}
+
+    .modal-backdrop{
+      position:fixed;
+      inset:0;
+      background:rgba(15,23,42,0.45);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index:10;
+      backdrop-filter:blur(4px);
+    }
+
+    .modal{
+      background:#ffffff;
+      padding:12px;
+      border-radius:18px;
+      min-width:280px;
+      max-width:92vw;
+      box-shadow:0 18px 45px rgba(15,23,42,0.45);
+      animation:slideUp .18s ease-out;
+    }
+
+    @keyframes slideUp{
+      from{opacity:0;transform:translateY(12px);}
+      to{opacity:1;transform:translateY(0);}
+    }
+
+    .row{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      margin-bottom:8px;
+    }
+
+    .input{
+      padding:8px;
+      border-radius:10px;
+      border:1px solid #e5e7eb;
+      width:100%;
+      font-size:13px;
+    }
+
+    .edit-header-sub{
+      font-size:11px;
+      color:var(--muted);
+      margin-bottom:8px;
+    }
+
+    .edit-controls{
+      display:flex;
+      justify-content:flex-end;
+      gap:8px;
+      margin-bottom:8px;
+    }
+
+    .edit-controls button{
+      flex:0 0 auto;
+      font-size:11px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid #e5e7eb;
+      background:#f9fafb;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:4px;
+    }
+
+    .edit-controls button:active{
+      transform:translateY(1px) scale(0.98);
+    }
+
+    .edit-grid{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      max-height:260px;
+      overflow:auto;
+      padding-right:2px;
+    }
+
+    .edit-pill{
+      flex:1 1 46%;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:9px 9px;
+      border-radius:12px;
+      border:1px solid #e5e7eb;
+      background:#ffffff;
+      cursor:pointer;
+      font-size:13px;
+      justify-content:flex-start;
+      box-shadow:0 4px 10px rgba(15,23,42,0.06);
+      transition:background .12s ease,border-color .12s ease,box-shadow .12s ease,transform .08s ease;
+    }
+
+    .edit-pill-badge{
+      width:22px;
+      height:22px;
+      border-radius:999px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:12px;
+      font-weight:600;
+      color:#ffffff;
+    }
+
+    .edit-pill-label{
+      flex:1;
+      font-weight:500;
+      text-align:left;
+      white-space:nowrap;
+      text-overflow:ellipsis;
+      overflow:hidden;
+    }
+
+    .edit-pill-on{
+      border-color:#111827;
+      background:radial-gradient(circle at top left,#4f46e5,#111827);
+      color:#f9fafb;
+      box-shadow:0 8px 18px rgba(15,23,42,0.4);
+      transform:translateY(-1px);
+    }
+
+    .edit-pill-on .edit-pill-label{
+      font-weight:600;
+    }
+
+    .edit-pill-on .edit-pill-badge{
+      box-shadow:0 0 0 1px rgba(255,255,255,0.7);
+    }
+
+    .edit-footer{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:8px;
+      margin-top:10px;
+    }
+
+    .edit-footer-right{
+      display:flex;
+      gap:8px;
+    }
+
+    /* Payments view list */
+    #paymentsList{
+      max-height:220px;
+      overflow:auto;
+    }
+
+    .payment-item{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      padding:6px 8px;
+      border-radius:10px;
+      border:1px solid var(--payment-border);
+      background:var(--payment-bg);
+      font-size:11px;
+      margin-bottom:4px;
+      position:relative;
+    }
+
+    .payment-item-main{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+    }
+
+    .payment-item-date{
+      font-weight:600;
+    }
+
+    .payment-item-note{
+      font-size:10px;
+      color:var(--muted);
+    }
+
+    .payment-item-amount{
+      font-weight:600;
+      margin-left:8px;
+    }
+
+    .payment-delete{
+      position:absolute;
+      top:4px;
+      right:6px;
+      font-size:11px;
+      color:#9ca3af;
+      cursor:pointer;
+    }
+
+    .payment-delete:hover{
+      color:#ef4444;
+    }
+
+    /* Profile buttons in modal */
+    .profile-card{
+      position:relative;
+      width:100%;
+      padding:10px 10px;
+      border-radius:14px;
+      border:1px solid #e5e7eb;
+      background:#f9fafb;
+      font-size:12px;
+      font-weight:500;
+      margin-bottom:6px;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      transition:background .12s ease, border-color .12s ease, transform .08s ease, box-shadow .12s ease;
+    }
+
+    .profile-card-active{
+      border-color:#4f46e5;
+      background:#eef2ff;
+      box-shadow:0 4px 12px rgba(79,70,229,0.25);
+    }
+
+    .profile-card-label{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+    }
+
+    .profile-card-sub{
+      font-size:10px;
+      color:var(--muted);
+    }
+
+    .profile-card-x{
+      position:absolute;
+      top:6px;
+      right:8px;
+      font-size:12px;
+      color:#9ca3af;
+      cursor:pointer;
+    }
+
+    .profile-card-x:hover{
+      color:#ef4444;
+    }
+
+    @media (max-width:480px){
+      .app{border-radius:18px;}
+      .day{height:54px;}
+      .edit-grid{max-height:220px;}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="app" role="application">
+      <div class="content">
+        <div class="topbar">
+          <div class="app-title">Daylio</div>
+          <div class="topbar-settings">
+            <button id="openSettings" class="icon-btn" title="Settings">
+              <span>⚙</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="header">
+          <div class="title-wrap">
+            <div class="subtitle" id="subtitle">Stored on this device</div>
+            <div class="profile-pill" id="profilePill">
+              <span class="profile-dot"></span>
+              <span id="profileLabel">Tracker: …</span>
+            </div>
+          </div>
+          <div class="controls">
+            <button id="prev" class="icon-btn">
+              <span>◀</span>
+            </button>
+            <div id="monthLabel" class="month-label muted"></div>
+            <button id="next" class="icon-btn">
+              <span>▶</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="range">
+          <label class="small">From
+            <input type="date" id="startDate" class="input">
+          </label>
+          <label class="small">To
+            <input type="date" id="endDate" class="input">
+          </label>
+        </div>
+
+        <div id="viewFilters" class="filters"></div>
+
+        <div id="calendarWrap">
+          <div id="weekdays" class="calendar"></div>
+          <div id="calendar" class="calendar" aria-label="calendar"></div>
+        </div>
+
+        <!-- Payments view -->
+        <div id="paymentsView" style="display:none;margin-top:6px;">
+          <div style="font-size:12px;font-weight:600;margin-bottom:4px;text-align:center;">Payments</div>
+          <div class="row">
+            <input id="paymentAmount" class="input" type="number" step="0.01" placeholder="Amount (₹)">
+          </div>
+          <div class="row">
+            <input id="paymentDate" class="input" type="date">
+          </div>
+          <div class="row">
+            <input id="paymentNote" class="input" placeholder="Note (optional)">
+          </div>
+          <div class="row" style="margin-bottom:4px;">
+            <button id="addPaymentBtn" class="countBtn small" style="flex:1;justify-content:center;border-radius:999px;">
+              + Add payment
+            </button>
+          </div>
+          <div id="paymentsList"></div>
+          <div class="muted" style="font-size:11px;margin-top:6px;" id="ledgerSummary">
+            No payments yet for this tracker.
+          </div>
+        </div>
+
+        <div id="summary" class="summary" aria-live="polite"></div>
+
+        <div class="footer" id="footer"></div>
+      </div>
+    </div>
+  </div>
+
+  <input type="file" id="csvFile" accept=".csv" style="display:none" />
+
+  <!-- New category modal -->
+  <div id="newModal" style="display:none" class="modal-backdrop">
+    <div class="modal">
+      <div style="font-weight:700;margin-bottom:6px">Create new category</div>
+      <div class="row">
+        <input id="newName" class="input" placeholder="Name (e.g. Breakfast)">
+      </div>
+      <div class="row">
+        <input id="newColor" type="color" value="#2196f3" style="width:56px;height:40px;border-radius:10px;border:1px solid #e5e7eb;">
+        <span class="muted" style="font-size:11px;">Pick a color</span>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px">
+        <button id="cancelNew" class="ghost small bigbtn" style="flex:0 0 auto;padding:7px 12px;border-radius:999px;">Cancel</button>
+        <button id="createNew" class="countBtn small" style="flex:0 0 auto;padding:7px 14px;border-radius:999px;">Create</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Manage categories modal -->
+  <div id="manageModal" style="display:none" class="modal-backdrop">
+    <div class="modal">
+      <div style="font-weight:700;margin-bottom:6px">Manage categories & rates</div>
+      <div id="manageList"></div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px">
+        <button id="closeManage" class="ghost small bigbtn" style="flex:0 0 auto;padding:7px 14px;border-radius:999px;">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit day modal -->
+  <div id="editModal" style="display:none" class="modal-backdrop">
+    <div class="modal">
+      <div id="editTitle" style="font-weight:700;margin-bottom:2px"></div>
+      <div class="edit-header-sub">Tap to toggle which items were done for this day.</div>
+      <div id="editBody"></div>
+      <div class="edit-footer">
+        <button id="delEdit" class="ghost small bigbtn"
+                style="flex:0 0 auto;padding:7px 12px;border-radius:999px;background:#fef2f2;border-color:#fecaca;color:#b91c1c;">
+          Clear day
+        </button>
+        <div class="edit-footer-right">
+          <button id="closeEdit" class="ghost small bigbtn"
+                  style="flex:0 0 auto;padding:7px 12px;border-radius:999px;">
+            Cancel
+          </button>
+          <button id="saveEdit" class="countBtn small"
+                  style="flex:0 0 auto;padding:7px 16px;border-radius:999px;">
+            Save
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings modal (only export / import) -->
+  <div id="settingsModal" style="display:none" class="modal-backdrop">
+    <div class="modal">
+      <div style="font-weight:700;margin-bottom:6px">Settings</div>
+      <div class="muted" style="font-size:11px;margin-bottom:6px;">
+        Data is stored only on this device (per browser).
+      </div>
+
+      <div style="font-weight:600;font-size:12px;margin-bottom:4px;margin-top:4px;">Export / Import</div>
+      <div class="row">
+        <button id="settingsExport" class="countBtn small" style="flex:1;justify-content:center;border-radius:999px;">
+          ⬇ Export CSV (this tracker)
+        </button>
+      </div>
+      <div class="row">
+        <button id="settingsImport" class="ghost small bigbtn" style="flex:1;justify-content:center;border-radius:999px;">
+          ⬆ Import CSV (replace this tracker)
+        </button>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px">
+        <button id="closeSettings" class="ghost small bigbtn" style="flex:0 0 auto;padding:7px 14px;border-radius:999px;">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Trackers (profiles) modal -->
+  <div id="profileModal" style="display:none" class="modal-backdrop">
+    <div class="modal">
+      <div style="font-weight:700;margin-bottom:6px">Trackers</div>
+      <div class="muted" style="font-size:11px;margin-bottom:6px;">
+        Use different trackers for different things, e.g. <strong>Meals</strong>, <strong>Water Gallons</strong>.
+      </div>
+      <div id="profileList" style="margin-bottom:8px"></div>
+      <div class="row">
+        <input id="newProfileName" class="input" placeholder="New tracker name (e.g. Water Gallons)">
+        <button id="addProfileBtn" class="countBtn small" style="padding:6px 10px;border-radius:999px;">Add</button>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px">
+        <button id="closeProfile" class="ghost small bigbtn" style="flex:0 0 auto;padding:7px 14px;border-radius:999px;">Close</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+(function(){
+  // ---------- Helpers ----------
+  function pad(n){ return n.toString().padStart(2,'0'); }
+  function iso(d){ return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()); }
+  function parseIso(s){
+    var parts = s.split('-');
+    return new Date(parseInt(parts[0],10), parseInt(parts[1],10)-1, parseInt(parts[2],10));
+  }
+
+  // ---------- State ----------
+  var STORAGE_KEY = 'daylio_tracker_v1';
+  var DEFAULT_COLORS = ['#4caf50','#ff7043','#2196f3','#9c27b0','#ff9800','#009688'];
+
+  function createDefaultProfile(name){
+    return {
+      name: name || 'Meals',
+      categories: [
+        {id:'c_lunch',name:'Lunch',color:'#4caf50'},
+        {id:'c_dinner',name:'Dinner',color:'#ff7043'}
+      ],
+      entries: {},   // date -> {catId: true}
+      rates: {},     // catId -> number
+      payments: []   // {id, amount, date, note}
+    };
+  }
+
+  function createDefaultRoot(){
+    var root = {
+      profiles: {},
+      activeProfileId: 'meals'
+    };
+    root.profiles['meals'] = createDefaultProfile('Meals');
+    return root;
+  }
+
+  function normalizeProfile(p, fallbackName){
+    if (!p.categories) p.categories = [];
+    if (!p.entries) p.entries = {};
+    if (!p.rates) p.rates = {};
+    // migrate old advances to payments if present
+    if (p.advances && !p.payments){
+      p.payments = p.advances;
+      delete p.advances;
+    }
+    if (!p.payments) p.payments = [];
+    if (!p.name) p.name = fallbackName || 'Tracker';
+  }
+
+  var rootState = null;
+  var data = null; // active profile
+
+  var today = new Date();
+  var viewDate = new Date(); viewDate.setDate(1);
+
+  var visibleCategoryIds = {};
+  var viewMode = 'calendar'; // 'calendar' | 'payments'
+
+  // ---------- DOM refs ----------
+  var monthLabel = document.getElementById('monthLabel');
+  var cal = document.getElementById('calendar');
+  var weekdays = document.getElementById('weekdays');
+  var startInput = document.getElementById('startDate');
+  var endInput = document.getElementById('endDate');
+  var summary = document.getElementById('summary');
+  var footer = document.getElementById('footer');
+  var viewFilters = document.getElementById('viewFilters');
+  var subtitleEl = document.getElementById('subtitle');
+  var calendarWrap = document.getElementById('calendarWrap');
+  var paymentsView = document.getElementById('paymentsView');
+  var paymentsList = document.getElementById('paymentsList');
+
+  var newModal = document.getElementById('newModal');
+  var manageModal = document.getElementById('manageModal');
+  var editModal = document.getElementById('editModal');
+  var settingsModal = document.getElementById('settingsModal');
+  var profileModal = document.getElementById('profileModal');
+
+  var csvInput = document.getElementById('csvFile');
+
+  var paymentAmountInput = document.getElementById('paymentAmount');
+  var paymentDateInput = document.getElementById('paymentDate');
+  var paymentNoteInput = document.getElementById('paymentNote');
+  var ledgerSummaryEl = document.getElementById('ledgerSummary');
+
+  var profilePill = document.getElementById('profilePill');
+  var profileLabel = document.getElementById('profileLabel');
+  var profileList = document.getElementById('profileList');
+  var newProfileName = document.getElementById('newProfileName');
+
+  startInput.value = iso(new Date(today.getFullYear(), today.getMonth(), 1));
+  endInput.value = iso(today);
+  paymentDateInput.value = iso(today);
+
+  // ---------- Load / Save ----------
+  function loadState(){
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      rootState = raw ? JSON.parse(raw) : null;
+    }catch(e){
+      rootState = null;
+    }
+    if (!rootState || !rootState.profiles){
+      rootState = createDefaultRoot();
+    }
+    if (!rootState.activeProfileId || !rootState.profiles[rootState.activeProfileId]){
+      var ids = Object.keys(rootState.profiles);
+      rootState.activeProfileId = ids[0] || 'meals';
+      if (!rootState.profiles[rootState.activeProfileId]){
+        rootState.profiles[rootState.activeProfileId] = createDefaultProfile('Meals');
+      }
+    }
+    // normalize
+    var ids2 = Object.keys(rootState.profiles);
+    for (var i=0;i<ids2.length;i++){
+      normalizeProfile(rootState.profiles[ids2[i]], ids2[i]);
+    }
+    data = rootState.profiles[rootState.activeProfileId];
+    ensureVisibleCatsInit();
+  }
+
+  function saveState(){
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(rootState));
+    }catch(e){}
+  }
+
+  // ---------- Visible categories ----------
+  function ensureVisibleCatsInit(){
+    visibleCategoryIds = {};
+    if (!data || !data.categories) return;
+    for (var i=0;i<data.categories.length;i++){
+      visibleCategoryIds[data.categories[i].id] = true;
+    }
+  }
+
+  function categoryIsVisible(id){
+    return !!visibleCategoryIds[id];
+  }
+
+  // ---------- Weekdays (start Monday) ----------
+  function renderWeekdays(){
+    var names = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    var html = '';
+    for (var i=0;i<names.length;i++){
+      html += '<div class="weekday">'+names[i]+'</div>';
+    }
+    weekdays.innerHTML = html;
+  }
+
+  // ---------- Payment date map ----------
+  function getPaymentDateMap(){
+    var map = {};
+    if (data.payments){
+      for (var i=0;i<data.payments.length;i++){
+        var p = data.payments[i];
+        if (p && p.date){
+          map[p.date] = true;
+        }
+      }
+    }
+    return map;
+  }
+
+  // ---------- Calendar (Monday-first layout) ----------
+  function renderCalendar(){
+    monthLabel.textContent = viewDate.toLocaleString(undefined,{month:'short',year:'numeric'});
+    cal.innerHTML = '';
+
+    var year = viewDate.getFullYear();
+    var month = viewDate.getMonth();
+    var jsFirst = new Date(year,month,1).getDay(); // 0=Sun..6=Sat
+    var first = (jsFirst + 6) % 7; // 0=Mon,1=Tue,...6=Sun
+    var daysIn = new Date(year,month+1,0).getDate();
+    var paymentDates = getPaymentDateMap();
+
+    // leading blanks
+    for (var i=0;i<first;i++){
+      var empty = document.createElement('div');
+      empty.className = 'day';
+      empty.style.background = 'transparent';
+      empty.style.border = 'none';
+      empty.style.boxShadow = 'none';
+      empty.style.cursor = 'default';
+      empty.style.pointerEvents = 'none';
+      cal.appendChild(empty);
+    }
+
+    for (var d=1; d<=daysIn; d++){
+      (function(dayNum){
+        var date = new Date(year,month,dayNum);
+        var key = iso(date);
+
+        var el = document.createElement('div');
+        el.className = 'day';
+
+        if (paymentDates[key]){
+          el.classList.add('payment-day');
+        }
+
+        var num = document.createElement('div');
+        num.className = 'daynum';
+        num.textContent = dayNum;
+        el.appendChild(num);
+
+        var dots = document.createElement('div');
+        dots.className = 'dots';
+
+        for (var c=0;c<data.categories.length;c++){
+          var cat = data.categories[c];
+          if (!categoryIsVisible(cat.id)) continue;
+          if (data.entries[key] && data.entries[key][cat.id]){
+            var dot = document.createElement('span');
+            dot.className='dot';
+            dot.style.background = cat.color;
+            dot.title = cat.name;
+            dots.appendChild(dot);
+          }
+        }
+
+        el.appendChild(dots);
+        if (iso(today) === key) el.classList.add('today');
+
+        el.addEventListener('click', function(){
+          openEdit(key);
+        });
+
+        cal.appendChild(el);
+      })(d);
+    }
+
+    updateSummary();
+  }
+
+  // ---------- Footer ----------
+  function renderFooter(){
+    footer.innerHTML = '';
+
+    // quick buttons per category
+    for (var i=0;i<data.categories.length;i++){
+      (function(cat){
+        var btn = document.createElement('button');
+        btn.className = 'bigbtn';
+        btn.style.background = cat.color;
+        btn.textContent = cat.name;
+        btn.addEventListener('click', function(){
+          toggleToday(cat.id);
+        });
+        footer.appendChild(btn);
+      })(data.categories[i]);
+    }
+
+    // add / manage
+    var newBtn = document.createElement('button');
+    newBtn.className='bigbtn ghost small';
+    newBtn.textContent='+ Category';
+    newBtn.addEventListener('click', function(){ showNew(true); });
+    footer.appendChild(newBtn);
+
+    var mgBtn = document.createElement('button');
+    mgBtn.className='bigbtn ghost small';
+    mgBtn.textContent='Manage';
+    mgBtn.addEventListener('click', function(){ showManage(true); });
+    footer.appendChild(mgBtn);
+  }
+
+  // ---------- View filters ----------
+  function renderViewFilters(){
+    viewFilters.innerHTML = '';
+    if (!data.categories.length) return;
+
+    var label = document.createElement('span');
+    label.className = 'filters-label';
+    label.textContent = 'Show:';
+    viewFilters.appendChild(label);
+
+    var allSelected = true;
+    for (var i=0;i<data.categories.length;i++){
+      if (!categoryIsVisible(data.categories[i].id)){
+        allSelected = false;
+        break;
+      }
+    }
+
+    (function(){
+      var btn = document.createElement('button');
+      btn.className = 'filter-btn' + (allSelected ? ' filter-btn-active' : '');
+      btn.textContent = 'All';
+      btn.addEventListener('click', function(){
+        for (var i=0;i<data.categories.length;i++){
+          visibleCategoryIds[data.categories[i].id] = true;
+        }
+        renderViewFilters();
+        renderCalendar();
+      });
+      viewFilters.appendChild(btn);
+    })();
+
+    for (var j=0;j<data.categories.length;j++){
+      (function(cat){
+        var btn = document.createElement('button');
+        btn.className = 'filter-btn' + (categoryIsVisible(cat.id) ? ' filter-btn-active' : '');
+
+        var dot = document.createElement('span');
+        dot.className = 'filter-color';
+        dot.style.background = cat.color;
+        var txt = document.createElement('span');
+        txt.textContent = cat.name;
+
+        btn.appendChild(dot);
+        btn.appendChild(txt);
+
+        btn.addEventListener('click', function(){
+          if (categoryIsVisible(cat.id)){
+            visibleCategoryIds[cat.id] = false;
+          } else {
+            visibleCategoryIds[cat.id] = true;
+          }
+
+          var anyVisible = false;
+          for (var k=0;k<data.categories.length;k++){
+            if (categoryIsVisible(data.categories[k].id)){ anyVisible = true; break; }
+          }
+          if (!anyVisible) visibleCategoryIds[cat.id] = true;
+
+          renderViewFilters();
+          renderCalendar();
+        });
+
+        viewFilters.appendChild(btn);
+      })(data.categories[j]);
+    }
+  }
+
+  // ---------- Toggle today ----------
+  function toggleToday(catId){
+    var key = iso(today);
+    if (!data.entries[key]) data.entries[key] = {};
+    data.entries[key][catId] = !data.entries[key][catId];
+    var any = false;
+    for (var id in data.entries[key]){
+      if (data.entries[key][id]){ any = true; break; }
+    }
+    if (!any) delete data.entries[key];
+    saveState();
+    renderCalendar();
+  }
+
+  // ---------- New category ----------
+  function showNew(show){
+    newModal.style.display = show ? 'flex' : 'none';
+    if (show){
+      document.getElementById('newName').focus();
+    }
+  }
+
+  document.getElementById('createNew').addEventListener('click', function(){
+    var name = document.getElementById('newName').value.trim();
+    var color = document.getElementById('newColor').value;
+    if (!name){
+      alert('Enter a name');
+      return;
+    }
+    var id = 'c_' + Date.now();
+    data.categories.push({id:id, name:name, color:color});
+    saveState();
+    ensureVisibleCatsInit();
+    renderViewFilters();
+    renderFooter();
+    renderCalendar();
+    document.getElementById('newName').value = '';
+    showNew(false);
+  });
+
+  document.getElementById('cancelNew').addEventListener('click', function(){
+    showNew(false);
+  });
+
+  // ---------- Manage categories ----------
+  function showManage(show){
+    manageModal.style.display = show ? 'flex' : 'none';
+    if (!show) return;
+
+    var list = document.getElementById('manageList');
+    list.innerHTML = '';
+
+    for (var i=0;i<data.categories.length;i++){
+      (function(cat, idx){
+        var row = document.createElement('div');
+        row.className = 'row';
+
+        var name = document.createElement('input');
+        name.className='input';
+        name.value = cat.name;
+        name.style.flex = '1.3';
+        name.addEventListener('change', function(){
+          data.categories[idx].name = name.value;
+          saveState();
+          renderFooter();
+          renderViewFilters();
+          renderCalendar();
+          updateSummary();
+        });
+
+        var color = document.createElement('input');
+        color.type = 'color';
+        color.value = cat.color;
+        color.style.width = '48px';
+        color.style.height = '32px';
+        color.style.borderRadius = '10px';
+        color.style.border = '1px solid #e5e7eb';
+        color.addEventListener('input', function(){
+          data.categories[idx].color = color.value;
+          saveState();
+          renderFooter();
+          renderViewFilters();
+          renderCalendar();
+          updateSummary();
+        });
+
+        var rateWrap = document.createElement('div');
+        rateWrap.style.display = 'flex';
+        rateWrap.style.flexDirection = 'column';
+        rateWrap.style.alignItems = 'flex-start';
+        rateWrap.style.minWidth = '80px';
+
+        var rateInput = document.createElement('input');
+        rateInput.type = 'number';
+        rateInput.min = '0';
+        rateInput.step = '0.01';
+        rateInput.className = 'input';
+        rateInput.style.padding = '6px 8px';
+        rateInput.style.fontSize = '12px';
+        rateInput.style.width = '100%';
+
+        var currentRate = (data.rates && data.rates[cat.id] != null) ? data.rates[cat.id] : '';
+        rateInput.value = currentRate;
+
+        rateInput.addEventListener('change', function(){
+          var v = parseFloat(rateInput.value);
+          if (isNaN(v)){
+            delete data.rates[cat.id];
+          }else{
+            data.rates[cat.id] = v;
+          }
+          saveState();
+          updateSummary();
+        });
+
+        var rateLabel = document.createElement('span');
+        rateLabel.textContent = 'Rate (₹)';
+        rateLabel.style.fontSize = '10px';
+        rateLabel.style.color = '#6b7280';
+        rateLabel.style.marginTop = '2px';
+
+        rateWrap.appendChild(rateInput);
+        rateWrap.appendChild(rateLabel);
+
+        var del = document.createElement('button');
+        del.className = 'ghost small';
+        del.textContent = 'Delete';
+        del.style.borderRadius = '999px';
+        del.style.padding = '6px 10px';
+        del.addEventListener('click', function(){
+          if (confirm('Delete "'+cat.name+'"? This will remove all its marks.')){
+            for (var dateKey in data.entries){
+              if (data.entries[dateKey][cat.id]) delete data.entries[dateKey][cat.id];
+              var any = false;
+              for (var cid in data.entries[dateKey]){
+                if (data.entries[dateKey][cid]){ any=true; break; }
+              }
+              if (!any) delete data.entries[dateKey];
+            }
+            delete data.rates[cat.id];
+            data.categories.splice(idx,1);
+            saveState();
+            ensureVisibleCatsInit();
+            renderFooter();
+            renderViewFilters();
+            renderCalendar();
+            updateSummary();
+            showManage(false);
+          }
+        });
+
+        row.appendChild(name);
+        row.appendChild(color);
+        row.appendChild(rateWrap);
+        row.appendChild(del);
+        list.appendChild(row);
+      })(data.categories[i], i);
+    }
+  }
+
+  document.getElementById('closeManage').addEventListener('click', function(){
+    showManage(false);
+  });
+
+  // ---------- Ledger ----------
+  function computeLedgerTotals(){
+    var paymentTotal = 0;
+    if (data.payments && data.payments.length){
+      for (var i=0;i<data.payments.length;i++){
+        var p = data.payments[i];
+        if (p && typeof p.amount === 'number'){
+          paymentTotal += p.amount;
+        }
+      }
+    }
+
+    var consumedTotal = 0;
+    if (data.rates && data.categories && data.entries){
+      for (var dateKey in data.entries){
+        var entry = data.entries[dateKey];
+        for (var i=0;i<data.categories.length;i++){
+          var cat = data.categories[i];
+          if (entry[cat.id] && data.rates[cat.id] != null){
+            consumedTotal += data.rates[cat.id];
+          }
+        }
+      }
+    }
+
+    var balance = paymentTotal - consumedTotal;
+    return { paymentTotal:paymentTotal, consumedTotal:consumedTotal, balance:balance };
+  }
+
+  function updateLedgerSummaryUI(){
+    var t = computeLedgerTotals();
+    if (!data.payments || !data.payments.length){
+      ledgerSummaryEl.textContent = 'No payments yet for this tracker.';
+    } else {
+      ledgerSummaryEl.textContent =
+        'Payments: ₹'+t.paymentTotal.toFixed(2)+
+        ' · Used: ₹'+t.consumedTotal.toFixed(2)+
+        ' · Balance: ₹'+t.balance.toFixed(2)+' (positive = you still have credit).';
+    }
+  }
+
+  // ---------- Settings ----------
+  document.getElementById('openSettings').addEventListener('click', function(){
+    settingsModal.style.display = 'flex';
+  });
+
+  function showSettings(show){
+    settingsModal.style.display = show ? 'flex' : 'none';
+  }
+
+  document.getElementById('closeSettings').addEventListener('click', function(){
+    showSettings(false);
+  });
+
+  // ---------- Payments ----------
+  document.getElementById('addPaymentBtn').addEventListener('click', function(){
+    var amt = parseFloat(paymentAmountInput.value);
+    if (isNaN(amt) || amt <= 0){
+      alert('Enter a valid positive amount.');
+      return;
+    }
+    var dt = paymentDateInput.value || iso(new Date());
+    var note = paymentNoteInput.value.trim();
+
+    if (!data.payments) data.payments = [];
+    data.payments.push({
+      id: 'pay_'+Date.now(),
+      amount: amt,
+      date: dt,
+      note: note
+    });
+
+    paymentAmountInput.value = '';
+    paymentNoteInput.value = '';
+    saveState();
+    updateLedgerSummaryUI();
+    renderCalendar();
+    renderPaymentsView();
+    updateSummary();
+  });
+
+  function deletePayment(id){
+    if (!data.payments) return;
+    data.payments = data.payments.filter(function(p){ return p.id !== id; });
+    saveState();
+    updateLedgerSummaryUI();
+    renderCalendar();
+    renderPaymentsView();
+    updateSummary();
+  }
+
+  function renderPaymentsView(){
+    paymentsList.innerHTML = '';
+    if (!data.payments || !data.payments.length){
+      var empty = document.createElement('div');
+      empty.className = 'muted';
+      empty.style.fontSize = '11px';
+      empty.textContent = 'No payments yet.';
+      paymentsList.appendChild(empty);
+      return;
+    }
+    var arr = data.payments.slice().sort(function(a,b){
+      if (a.date === b.date) return 0;
+      return a.date < b.date ? -1 : 1;
+    });
+    for (var i=0;i<arr.length;i++){
+      var p = arr[i];
+      var item = document.createElement('div');
+      item.className = 'payment-item';
+
+      var main = document.createElement('div');
+      main.className = 'payment-item-main';
+
+      var dSpan = document.createElement('div');
+      dSpan.className = 'payment-item-date';
+      dSpan.textContent = p.date;
+
+      var noteSpan = document.createElement('div');
+      noteSpan.className = 'payment-item-note';
+      noteSpan.textContent = p.note || '';
+
+      main.appendChild(dSpan);
+      if (p.note){
+        main.appendChild(noteSpan);
+      }
+
+      var amt = document.createElement('div');
+      amt.className = 'payment-item-amount';
+      amt.textContent = '₹'+p.amount.toFixed(2);
+
+      var del = document.createElement('span');
+      del.className = 'payment-delete';
+      del.textContent = '×';
+      del.title = 'Delete payment';
+      del.addEventListener('click', function(id){
+        return function(e){
+          e.stopPropagation();
+          if (confirm('Delete this payment?')){
+            deletePayment(id);
+          }
+        };
+      }(p.id));
+
+      item.appendChild(main);
+      item.appendChild(amt);
+      item.appendChild(del);
+      paymentsList.appendChild(item);
+    }
+  }
+
+  function setViewMode(mode){
+    if (mode === viewMode) return;
+    viewMode = mode;
+    if (mode === 'payments'){
+      calendarWrap.style.display = 'none';
+      footer.style.display = 'none';
+      paymentsView.style.display = 'block';
+      renderPaymentsView();
+      updateLedgerSummaryUI();
+    } else {
+      calendarWrap.style.display = 'block';
+      footer.style.display = 'flex';
+      paymentsView.style.display = 'none';
+    }
+  }
+
+  // Swipe gestures for switching Calendar <-> Payments
+  var appEl = document.querySelector('.app');
+  var touchStartX = null;
+  var touchStartY = null;
+
+  appEl.addEventListener('touchstart', function(e){
+    if (!e.touches.length) return;
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+  });
+
+  appEl.addEventListener('touchend', function(e){
+    if (touchStartX === null) return;
+    var dx = e.changedTouches[0].clientX - touchStartX;
+    var dy = e.changedTouches[0].clientY - touchStartY;
+    var absX = Math.abs(dx);
+    var absY = Math.abs(dy);
+    if (absX > 50 && absX > absY){
+      if (dx < 0 && viewMode === 'calendar'){
+        setViewMode('payments');
+      } else if (dx > 0 && viewMode === 'payments'){
+        setViewMode('calendar');
+      }
+    }
+    touchStartX = touchStartY = null;
+  });
+
+  // ---------- Edit day ----------
+  var editingKey = null;
+
+  function openEdit(key){
+    editingKey = key;
+    document.getElementById('editTitle').textContent = 'Edit ' + key;
+    var body = document.getElementById('editBody');
+    body.innerHTML = '';
+
+    var current = data.entries[key] || {};
+
+    var controls = document.createElement('div');
+    controls.className = 'edit-controls';
+
+    var toggleAllBtn = document.createElement('button');
+    toggleAllBtn.textContent = 'Toggle all';
+    toggleAllBtn.addEventListener('click', function(){
+      var pills = body.querySelectorAll('.edit-pill');
+      if (!pills.length) return;
+
+      var allOn = true;
+      for (var i = 0; i < pills.length; i++) {
+        if (!pills[i].classList.contains('edit-pill-on')) {
+          allOn = false;
+          break;
+        }
+      }
+
+      for (var i = 0; i < pills.length; i++) {
+        if (allOn) {
+          pills[i].classList.remove('edit-pill-on');
+        } else {
+          pills[i].classList.add('edit-pill-on');
+        }
+      }
+    });
+
+    controls.appendChild(toggleAllBtn);
+    body.appendChild(controls);
+
+    var grid = document.createElement('div');
+    grid.className = 'edit-grid';
+
+    for (var i=0;i<data.categories.length;i++){
+      (function(cat){
+        var pill = document.createElement('button');
+        pill.type = 'button';
+        pill.className = 'edit-pill';
+        if (current[cat.id]) pill.classList.add('edit-pill-on');
+        pill.setAttribute('data-cid', cat.id);
+
+        var badge = document.createElement('span');
+        badge.className = 'edit-pill-badge';
+        badge.style.background = cat.color;
+        badge.textContent = (cat.name || '?').charAt(0).toUpperCase();
+
+        var label = document.createElement('span');
+        label.className = 'edit-pill-label';
+        label.textContent = cat.name;
+
+        pill.appendChild(badge);
+        pill.appendChild(label);
+
+        pill.addEventListener('click', function(){
+          if (pill.classList.contains('edit-pill-on')){
+            pill.classList.remove('edit-pill-on');
+          }else{
+            pill.classList.add('edit-pill-on');
+          }
+        });
+
+        grid.appendChild(pill);
+      })(data.categories[i]);
+    }
+
+    body.appendChild(grid);
+    editModal.style.display = 'flex';
+  }
+
+  document.getElementById('saveEdit').addEventListener('click', function(){
+    var pills = document.querySelectorAll('#editBody .edit-pill');
+    var obj = {};
+    for (var i=0;i<pills.length;i++){
+      var pill = pills[i];
+      var id = pill.getAttribute('data-cid');
+      if (pill.classList.contains('edit-pill-on')){
+        obj[id] = true;
+      }
+    }
+    if (Object.keys(obj).length) data.entries[editingKey] = obj;
+    else delete data.entries[editingKey];
+
+    saveState();
+    editModal.style.display = 'none';
+    renderCalendar();
+  });
+
+  document.getElementById('delEdit').addEventListener('click', function(){
+    if (!editingKey) return;
+    if (confirm('Clear all marks for '+editingKey+'?')){
+      delete data.entries[editingKey];
+      saveState();
+      editModal.style.display='none';
+      renderCalendar();
+    }
+  });
+
+  document.getElementById('closeEdit').addEventListener('click', function(){
+    editModal.style.display='none';
+  });
+
+  // ---------- Summary ----------
+  function updateSummary(){
+    var start = parseIso(startInput.value);
+    var end = parseIso(endInput.value);
+    if (start > end){
+      summary.textContent = 'Start must be ≤ End';
+      return;
+    }
+
+    var catsToCount = [];
+    for (var i=0;i<data.categories.length;i++){
+      if (categoryIsVisible(data.categories[i].id)){
+        catsToCount.push(data.categories[i]);
+      }
+    }
+
+    if (!catsToCount.length){
+      summary.textContent = 'No categories selected in view.';
+      return;
+    }
+
+    var parts = [];
+    var totalAmount = 0;
+
+    for (var c=0;c<catsToCount.length;c++){
+      var cat = catsToCount[c];
+      var count = 0;
+      var d = new Date(start.getTime());
+      while (d <= end){
+        var k = iso(d);
+        if (data.entries[k] && data.entries[k][cat.id]) count++;
+        d.setDate(d.getDate()+1);
+      }
+      var rate = (data.rates && data.rates[cat.id] != null) ? data.rates[cat.id] : null;
+      var amount = (rate != null) ? rate * count : null;
+      if (amount != null) totalAmount += amount;
+      parts.push({name:cat.name,color:cat.color,count:count,rate:rate,amount:amount});
+    }
+
+    var html = '';
+    for (var p=0;p<parts.length;p++){
+      var item = parts[p];
+      html += '<div class="summary-item">';
+      html += '<div class="summary-color" style="background:'+item.color+'"></div> ';
+      if (item.rate != null){
+        html += item.name+': '+item.count+' × ₹'+item.rate+' = ₹'+item.amount.toFixed(2);
+      }else{
+        html += item.name+': '+item.count;
+      }
+      html += '</div>';
+    }
+
+    if (totalAmount > 0){
+      html += '<div class="summary-item summary-total">Total: ₹'+totalAmount.toFixed(2)+'</div>';
+    }
+
+    var t = computeLedgerTotals();
+    if (t.paymentTotal > 0 || t.consumedTotal > 0){
+      html += '<div class="summary-item payment-chip">Payments: ₹'+t.paymentTotal.toFixed(2)+'</div>';
+      html += '<div class="summary-item payment-chip">Used (all time): ₹'+t.consumedTotal.toFixed(2)+'</div>';
+      html += '<div class="summary-item payment-chip">Balance: ₹'+t.balance.toFixed(2)+'</div>';
+    }
+
+    summary.innerHTML = html;
+  }
+
+  startInput.addEventListener('change', updateSummary);
+  endInput.addEventListener('change', updateSummary);
+
+  // ---------- Month nav ----------
+  document.getElementById('prev').addEventListener('click', function(){
+    viewDate.setMonth(viewDate.getMonth()-1);
+    renderCalendar();
+  });
+  document.getElementById('next').addEventListener('click', function(){
+    viewDate.setMonth(viewDate.getMonth()+1);
+    renderCalendar();
+  });
+
+  // ---------- CSV ----------
+  function exportCsv(){
+    if (!data.categories.length){
+      alert('No categories to export.');
+      return;
+    }
+
+    var cats = data.categories;
+    var header = ['date'];
+    for (var i=0;i<cats.length;i++){
+      header.push(cats[i].name);
+    }
+
+    var dates = Object.keys(data.entries || {}).sort();
+    var rows = [header.join(',')];
+
+    for (var d=0; d<dates.length; d++){
+      var date = dates[d];
+      var entry = data.entries[date] || {};
+      var row = [date];
+      for (var j=0;j<cats.length;j++){
+        row.push(entry[cats[j].id] ? '1' : '');
+      }
+      rows.push(row.join(','));
+    }
+
+    var csv = rows.join('\n');
+    var blob = new Blob([csv], {type:'text/csv'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    var ts = new Date().toISOString().slice(0,10);
+    var nameSafe = (data.name || 'tracker').replace(/[^a-z0-9]+/gi,'_');
+    a.download = 'tracker-' + nameSafe + '-' + ts + '.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function importCsvText(text){
+    var lines = text.trim().split(/\r?\n/);
+    if (lines.length < 2){
+      alert('CSV seems empty.');
+      return;
+    }
+    var header = lines[0].split(',');
+    if (!header.length || header[0].toLowerCase() !== 'date'){
+      alert('First column must be "date".');
+      return;
+    }
+    var catNames = header.slice(1);
+    if (!catNames.length){
+      alert('No category columns found.');
+      return;
+    }
+
+    var newCats = [];
+    for (var i=0;i<catNames.length;i++){
+      newCats.push({
+        id: 'c_' + Date.now() + '_' + i,
+        name: catNames[i] || ('Category ' + (i+1)),
+        color: DEFAULT_COLORS[i % DEFAULT_COLORS.length]
+      });
+    }
+
+    var newEntries = {};
+    for (var l=1;l<lines.length;l++){
+      var line = lines[l].trim();
+      if (!line) continue;
+      var cols = line.split(',');
+      var date = cols[0];
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) continue;
+
+      var obj = {};
+      for (var c=1;c<cols.length && c<=newCats.length;c++){
+        if (cols[c].trim()){
+          obj[newCats[c-1].id] = true;
+        }
+      }
+      if (Object.keys(obj).length){
+        newEntries[date] = obj;
+      }
+    }
+
+    if (!Object.keys(newEntries).length){
+      if (!confirm('No marks found in CSV. Replace categories anyway?')) return;
+    } else {
+      if (!confirm('Import will REPLACE current categories and entries for this tracker. Continue?')) return;
+    }
+
+    data.categories = newCats;
+    data.entries = newEntries;
+    data.rates = {};
+    saveState();
+    ensureVisibleCatsInit();
+    renderViewFilters();
+    renderFooter();
+    renderCalendar();
+    updateSummary();
+    alert('Import complete.');
+  }
+
+  document.getElementById('settingsExport').addEventListener('click', exportCsv);
+  document.getElementById('settingsImport').addEventListener('click', function(){
+    csvInput.click();
+  });
+
+  csvInput.addEventListener('change', function(e){
+    var file = e.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(ev){
+      importCsvText(ev.target.result || '');
+      csvInput.value = '';
+    };
+    reader.readAsText(file);
+  });
+
+  // ---------- Trackers (profiles) ----------
+  function renderProfileLabel(){
+    profileLabel.textContent = 'Tracker: ' + (data.name || rootState.activeProfileId);
+  }
+
+  function renderProfiles(){
+    profileList.innerHTML = '';
+    var ids = Object.keys(rootState.profiles || {});
+    if (!ids.length){
+      profileList.textContent = 'No trackers.';
+      return;
+    }
+    for (var i=0;i<ids.length;i++){
+      (function(id){
+        var prof = rootState.profiles[id];
+        var card = document.createElement('div');
+        card.className = 'profile-card' + (id === rootState.activeProfileId ? ' profile-card-active' : '');
+        card.addEventListener('click', function(e){
+          if (e.target.classList.contains('profile-card-x')) return;
+          switchProfile(id);
+        });
+
+        var labelWrap = document.createElement('div');
+        labelWrap.className = 'profile-card-label';
+
+        var titleSpan = document.createElement('span');
+        titleSpan.textContent = prof.name || id;
+
+        var subSpan = document.createElement('span');
+        subSpan.className = 'profile-card-sub';
+        subSpan.textContent = (id === rootState.activeProfileId) ? 'Active' : 'Tap to switch';
+
+        labelWrap.appendChild(titleSpan);
+        labelWrap.appendChild(subSpan);
+
+        var x = document.createElement('span');
+        x.className = 'profile-card-x';
+        x.textContent = '×';
+        x.addEventListener('click', function(e){
+          e.stopPropagation();
+          var keys = Object.keys(rootState.profiles);
+          if (keys.length <= 1){
+            alert('You must have at least one tracker.');
+            return;
+          }
+          if (id === rootState.activeProfileId){
+            alert('You cannot delete the active tracker. Switch to another first.');
+            return;
+          }
+          if (confirm('Delete tracker "'+(prof.name || id) +'"? All its data will be lost.')){
+            delete rootState.profiles[id];
+            saveState();
+            renderProfiles();
+          }
+        });
+
+        card.appendChild(labelWrap);
+        card.appendChild(x);
+        profileList.appendChild(card);
+      })(ids[i]);
+    }
+  }
+
+  function switchProfile(id){
+    if (!rootState.profiles[id]) return;
+    rootState.activeProfileId = id;
+    data = rootState.profiles[id];
+    normalizeProfile(data, id);
+    ensureVisibleCatsInit();
+    saveState();
+    renderProfileLabel();
+    renderViewFilters();
+    renderFooter();
+    renderCalendar();
+    renderPaymentsView();
+    updateLedgerSummaryUI();
+    updateSummary();
+    renderProfiles();
+    setViewMode('calendar');
+  }
+
+  profilePill.addEventListener('click', function(){
+    renderProfiles();
+    profileModal.style.display = 'flex';
+  });
+
+  document.getElementById('closeProfile').addEventListener('click', function(){
+    profileModal.style.display = 'none';
+  });
+
+  document.getElementById('addProfileBtn').addEventListener('click', function(){
+    var name = newProfileName.value.trim();
+    if (!name){
+      alert('Enter a tracker name.');
+      return;
+    }
+    var baseId = name.toLowerCase().replace(/[^a-z0-9]+/g,'_') || 'tracker';
+    var id = baseId;
+    var suffix = 1;
+    while (rootState.profiles[id]){
+      id = baseId + '_' + suffix++;
+    }
+    rootState.profiles[id] = createDefaultProfile(name);
+    saveState();
+    newProfileName.value = '';
+    renderProfiles();
+  });
+
+  // ---------- Init ----------
+  function init(){
+    subtitleEl.textContent = 'Stored on this device';
+    loadState();
+    renderWeekdays();
+    renderProfileLabel();
+    renderViewFilters();
+    renderFooter();
+    renderCalendar();
+    renderPaymentsView();
+    updateLedgerSummaryUI();
+    updateSummary();
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>

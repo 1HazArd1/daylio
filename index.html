@@ -1710,12 +1710,12 @@
       html += '<div class="summary-item summary-total">Total: ₹'+totalAmount.toFixed(2)+'</div>';
     }
 
-    var t = computeLedgerTotals();
-    if (t.paymentTotal > 0 || t.consumedTotal > 0){
-      html += '<div class="summary-item payment-chip">Payments: ₹'+t.paymentTotal.toFixed(2)+'</div>';
-      html += '<div class="summary-item payment-chip">Used (all time): ₹'+t.consumedTotal.toFixed(2)+'</div>';
-      html += '<div class="summary-item payment-chip">Balance: ₹'+t.balance.toFixed(2)+'</div>';
-    }
+    // var t = computeLedgerTotals();
+    // if (t.paymentTotal > 0 || t.consumedTotal > 0){
+    //   html += '<div class="summary-item payment-chip">Payments: ₹'+t.paymentTotal.toFixed(2)+'</div>';
+    //   html += '<div class="summary-item payment-chip">Used (all time): ₹'+t.consumedTotal.toFixed(2)+'</div>';
+    //   html += '<div class="summary-item payment-chip">Balance: ₹'+t.balance.toFixed(2)+'</div>';  
+    // }
 
     summary.innerHTML = html;
   }
